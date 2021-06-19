@@ -8,10 +8,10 @@ const open = async () => {
     const ws = new WebSocket(url);
 
     require('./controllers/connection')(ws);
-};
 
-const close = () => ws.close();
-process.on('SIGTERM', close);
-process.on('SIGINT', close);
+    const close = () => ws.close();
+    process.on('SIGTERM', close);
+    process.on('SIGINT', close);
+};
 
 open();

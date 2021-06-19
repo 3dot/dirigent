@@ -22,10 +22,12 @@ const isJson = (item) => {
 };
 
 const service = ws => {
-    const send = (ws) => ((action, data) => {
+    let status, ping = false;
+
+    const send = (action, data = Date.now()) => {
         console.log('Sending message', JSON.stringify({ action, data }, null, 2));
         ws.send(JSON.stringify({ action, data }));
-    })(ws);
+    };
 
     const messages = {
         config: async (data) => {
@@ -40,12 +42,22 @@ const service = ws => {
         }
     };
 
-    ws.on('open', () => {
+    ws.on('open', async () => {
         console.log('Connected');
+        status = true;
+
+        controllers.status["docker"]().then(res => send('callhome', res));
+
+        ping = setInterval(() => {
+            // keepalive 5min
+            if (status) send('ping');
+        }, 1000 * 60 * 5);
     });
 
     ws.on('close', () => {
         console.log('Disconnected');
+        status = false;
+        clearInterval(ping);
     });
 
     ws.on('message', data => {
