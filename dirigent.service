@@ -9,7 +9,6 @@ RestartSec=10
 StandardOutput=syslog
 StandardError=syslog
 SyslogIdentifier=Dirigent
-Environment=WS_URL=<%config.url> WS_SERVER=<%config.server> WS_SIGNATURE=<%config.signature>
 
 [Install]
 WantedBy=multi-user.target
