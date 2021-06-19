@@ -1,0 +1,10 @@
+{
+  "name": "dirigent",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Miran Hojnik <miran@3dot.net>",
+  "license": "MIT",
+  "dependencies": {
+    "ws": "^7.5.0"
+  }
+}
