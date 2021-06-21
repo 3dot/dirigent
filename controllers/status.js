@@ -1,19 +1,31 @@
-const spawn = require('util').promisify(require('child_process').spawn);
+const exec = require('util').promisify(require('child_process').exec);
 
-module.exports = {
+const status = {
+    monitor: async () => {
+        let interval = setInterval(async () => {
+            const current = await status["docker.liquidsoap"]();
+            console.log(current);
+        }, 10 * 1000);
+        return interval;
+    },
     docker: async () => {
-        const { stdout, stderr } = await spawn('docker container ls --format="{\"name\":\"{{.Names}}\", \"status\":\"{{.Status}}\"}" --all | jq --slurp');
-        console.log({ stdout, stderr });
-        if (stdout) return { list: JSON.parse(stdout) };
-        return {
-            list: []
-        }
+        const { stdout, stderr } = await exec(`docker container ls --format="{\\"name\\":\\"{{.Names}}\\", \\"status\\":\\"{{.Status}}\\"}" --all | jq --slurp`).catch(err => console.error(err));
+        if (stderr !== '') {
+            console.error(err);
+            return {
+                list: []
+            };
+        };
+        return { list: JSON.parse(stdout) };
     },
     "docker.liquidsoap": async () => {
-        const { stdout, stderr } = await spawn('docker inspect liquidsoap');
-        console.log({ stdout, stderr });
-        if (stdout) {
-            return JSON.parse(stdout);
-        }
+        const { stdout, stderr } = await exec('docker inspect liquidsoap');
+        const status = JSON.parse(stdout);
+        return {
+            id: status[0].Id,
+            state: status[0].State
+        };
     }
 };
+
+module.exports = status;

@@ -5,6 +5,7 @@
   "author": "Miran Hojnik <miran@3dot.net>",
   "license": "MIT",
   "dependencies": {
+    "axios": "^0.21.1",
     "ws": "^7.5.0"
   }
 }

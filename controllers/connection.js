@@ -1,3 +1,5 @@
+const config = require('./config');
+
 const controllers = {
     status: require('./status'),
     config: require('./config')
@@ -21,7 +23,7 @@ const isJson = (item) => {
     return false;
 };
 
-const service = ws => {
+const service = (ws, cleanup) => {
     let status, ping = false;
 
     const send = (action, data = Date.now()) => {
@@ -32,13 +34,27 @@ const service = ws => {
     const messages = {
         config: async (data) => {
             // download configuration file, restart container
+            await config.fetch.liquidsoap();
+            return config.container.restart('liquidsoap');
         },
         status: async (data) => {
             // report container status
             if (data === "docker.liquidsoap") {
                 const status = controllers.status[data];
-                send('status', status);
+                send('status', { for: data, data: status });
+            } else {
+                const status = controllers.status["docker"];
+                send('status', { for: "docker", data: status });
             }
+        },
+        start: async (data) => {
+            await config.compose.start();
+        },
+        restart: async (data) => {
+            await config.compose.restart();
+        },
+        stop: async (data) => {
+            await config.compose.stop();
         }
     };
 
@@ -46,7 +62,8 @@ const service = ws => {
         console.log('Connected');
         status = true;
 
-        controllers.status["docker"]().then(res => send('callhome', res));
+        const service = controllers.status["docker"]().then(res => controllers.config.startup(res));
+        cleanup.push(service);
 
         ping = setInterval(() => {
             // keepalive 5min
