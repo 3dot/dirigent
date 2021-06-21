@@ -11,7 +11,7 @@ const status = {
     docker: async () => {
         const { stdout, stderr } = await exec(`docker container ls --format="{\\"name\\":\\"{{.Names}}\\", \\"status\\":\\"{{.Status}}\\"}" --all | jq --slurp`).catch(err => console.error(err));
         if (stderr !== '') {
-            console.error(err);
+            console.error(stderr);
             return {
                 list: []
             };
