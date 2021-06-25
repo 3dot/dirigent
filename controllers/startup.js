@@ -25,6 +25,11 @@ const startup = async () => {
 
     status.monitor();
 
+    state.intervals.push(setInterval(async () => {
+        const data = state.get('container:liquidsoap');
+        send('status', { container: 'liquidsoap', data });
+    }, 5 * 60 * 1000));
+
     ws().on('message', data => {
         if (common.isJson(data)) data = JSON.parse(data);
         if (messages[data.action]) return messages[data.action](data.data);
