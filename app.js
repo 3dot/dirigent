@@ -1,22 +1,18 @@
-const WebSocket = require('ws');
-
 const config = require('./config.json');
-const cleanup = [];
+const state = require('./services/state');
+const { close } = require('./services/ws').init({
+    ws: config.ws,
+    server: config.server,
+    signature: config.signature
+});
 
-const open = async () => {
-    const url = `${config.ws}/?server=${config.server}&signature=${config.signature}`;
-    console.log('Connecting', url);
-    const ws = new WebSocket(url);
+require('./controllers/startup');
 
-    require('./controllers/connection')(ws, cleanup);
-
-    const close = () => {
-        cleanup.forEach(item => clearInterval(item));
-        ws.close();
-        process.exit(1);
-    };
-    process.on('SIGTERM', close);
-    process.on('SIGINT', close);
+const shutdown = () => {
+    state.intervals.forEach(item => clearInterval(item));
+    state.timeouts.forEach(item => clearTimeout(item));
+    close();
 };
 
-open();
+process.on('SIGTERM', shutdown);
+process.on('SIGINT', shutdown);

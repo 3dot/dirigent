@@ -1,22 +1,21 @@
 const exec = require('util').promisify(require('child_process').exec);
+const state = require('../services/state');
 
 const status = {
     monitor: async () => {
-        let interval = setInterval(async () => {
+        state.intervals.push(setInterval(async () => {
             const current = await status["docker.liquidsoap"]();
-            console.log(current);
-        }, 10 * 1000);
-        return interval;
+            state.set('container:liquidsoap', current);
+        }, 10 * 1000));
     },
     docker: async () => {
-        const { stdout, stderr } = await exec(`docker container ls --format="{\\"name\\":\\"{{.Names}}\\", \\"status\\":\\"{{.Status}}\\"}" --all | jq --slurp`).catch(err => console.error(err));
-        if (stderr !== '') {
-            console.error(stderr);
-            return {
-                list: []
-            };
+        const command = await exec(`docker container ls --format="{\\"name\\":\\"{{.Names}}\\", \\"status\\":\\"{{.Status}}\\"}" --all | jq --slurp`).catch(console.error);
+        if (!command) return [];
+        if (command.stderr !== '') {
+            console.error(command.stderr);
+            return [];
         };
-        return { list: JSON.parse(stdout) };
+        return JSON.parse(command.stdout);
     },
     "docker.liquidsoap": async () => {
         const { stdout, stderr } = await exec('docker inspect liquidsoap');

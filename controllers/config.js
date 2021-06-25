@@ -10,33 +10,20 @@ const client = axios.create({
 });
 
 const config = {
-    startup: async ({ list }) => {
-        // prepare config
-        console.log('Received active containers list', list);
-        if (!Array.isArray(list) || list.length === 0) {
-            console.log('No running containers, have to setup');
-            // fetch liquidsoap
-            await config.fetch.liquidsoap();
-            await config.compose.start();
-        } else {
-            console.log('Found running containers, monitoring...');
-        }
-        return status.monitor();
-    },
     compose: {
         start: async () => {
             console.log('Starting docker compose');
-            const { stdout, stderr } = await exec(`cd /home/srt2hls && docker-compose up -d`);
+            const { stdout } = await exec(`cd /home/srt2hls && docker-compose up -d`);
             return stdout;
         },
         restart: async () => {
             console.log('Restarting docker compose');
-            const { stdout, stderr } = await exec(`cd /home/srt2hls && docker-compose restart`);
+            const { stdout } = await exec(`cd /home/srt2hls && docker-compose restart`);
             return stdout;
         },
         stop: async () => {
             console.log('Stopping docker compose');
-            const { stdout, stderr } = await exec(`cd /home/srt2hls && docker-compose down`);
+            const { stdout } = await exec(`cd /home/srt2hls && docker-compose down`);
             return stdout;
         }
     },
@@ -49,10 +36,12 @@ const config = {
     },
     fetch: {
         all: async () => {
+            console.log('Fetch config');
             return client.post('/config', {});
         },
         liquidsoap: async () => {
             // fetch config file, replace existing
+            console.log('Fetch liquidsoap config');
             const config = await client.post('/config', {config: ['liquidsoap']});
             if (!config.data) return;
             
