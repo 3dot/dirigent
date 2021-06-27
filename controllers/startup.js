@@ -18,8 +18,8 @@ const startup = async () => {
     const containers = await status.docker();
     if (!Array.isArray(containers) || containers.length === 0) {
         // no containers running, run full config
-        //await config.fetch.liquidsoap();
-        //await config.compose.start();
+        await config.fetch.liquidsoap();
+        await config.compose.start();
         send('status', { ready: true });
     }
 
@@ -39,13 +39,13 @@ const startup = async () => {
 startup();
 
 state.emitter.on('set:container:liquidsoap', (key, [oldValue, newValue]) => {
-    console.log(key, [oldValue, newValue]);
+    //console.log(key, [oldValue, newValue]);
     if (!oldValue) {
-        console.log('Liquidsoap running status', newValue.state.Running);
+        //console.log('Liquidsoap running status', newValue.state.Running);
         return send('status', { service: "liquidsoap", running: newValue.state.Running });
     };
     if (oldValue.state.Status !== newValue.state.Status) {
-        console.log('Liquidsoap running status changed', oldValue.state.Running, newValue.state.Running);
+        //console.log('Liquidsoap running status changed', oldValue.state.Running, newValue.state.Running);
         return send('status', { service: "liquidsoap", running: newValue.state.Running });
     }
 });

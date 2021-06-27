@@ -13,7 +13,7 @@ let response = {
     }
 };
 
-module.exports.init = ({ ws, server, signature }) => {
+const connect = ({ ws, server, signature }) => {
     const url = `${ws}/?server=${server}&signature=${signature}`;
     console.log('Connecting', url);
     socket = new WebSocket(url);
@@ -29,12 +29,16 @@ module.exports.init = ({ ws, server, signature }) => {
     socket.on('close', () => {
         console.log('Disconnected');
         status = [false, +new Date()];
+        setTimeout(() => connect({ ws, server, signature }), 5000);
     });
 
     socket.on('message', data => {
         console.log('Received message', data);
     });
+};
 
+module.exports.init = ({ ws, server, signature }) => {
+    connect({ ws, server, signature });
     return response;
 };
 module.exports.socket = response;
