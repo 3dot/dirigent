@@ -7,7 +7,7 @@ let response = {
     status: () => status,
     ws: () => socket,
     close: () => socket.close(),
-    send: (channel, message) => {
+    send: async (channel, message) => {
         if (response.status()[0]) return socket.send(JSON.stringify({ action: channel, data: message }));
         queue.push([channel, message]);
     }
