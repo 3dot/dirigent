@@ -6,11 +6,13 @@ const { ws, send } = require('../services/ws').socket;
 const [
     messages,
     status,
-    config
+    config,
+    sync
 ] = [
     require('./messages'),
     require('./status'),
-    require('./config')
+    require('./config'),
+    require('./sync')
 ];
 
 const startup = async () => {
@@ -24,6 +26,7 @@ const startup = async () => {
     }
 
     status.monitor();
+    sync();
 
     state.intervals.push(setInterval(async () => {
         const data = state.get('container:liquidsoap');
