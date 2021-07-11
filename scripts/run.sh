@@ -1,4 +1,4 @@
 #!/bin/bash
-./awscli
-./docker
-./srt2hls
+sh ./awscli.sh
+sh ./docker.sh
+sh ./srt2hls.sh
