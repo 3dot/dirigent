@@ -1,4 +1,5 @@
 const { send } = require('../services/ws').socket;
+const state = require('../services/state');
 
 const [
     update,
@@ -11,6 +12,10 @@ const [
 ];
 
 module.exports = {
+    status: async () => {
+        const status = state.get('status:prometheus');
+        send('status', { service: "prometheus", status });
+    },
     update: async () => {
         // update dirigent, restart
         await update();

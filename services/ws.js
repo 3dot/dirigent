@@ -26,6 +26,7 @@ const connect = ({ ws, server, signature }) => {
             queue = [];
         };
     });
+    
     socket.on('close', () => {
         console.log('Disconnected');
         status = [false, +new Date()];
