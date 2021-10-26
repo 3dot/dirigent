@@ -1,21 +1,8 @@
 const _ = require('lodash');
 
-const common = require('../services/common');
 const state = require('../services/state');
 
 const { ws, send } = require('../services/ws').socket;
-
-const [
-    messages,
-    status,
-    config,
-    sync
-] = [
-    require('./messages'),
-    require('./status'),
-    require('./config'),
-    require('./sync')
-];
 
 module.exports = async (config) => {
     try {
