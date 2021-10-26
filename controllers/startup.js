@@ -17,31 +17,13 @@ const [
     require('./sync')
 ];
 
-const startup = async () => {
-    // container checkup
-    const containers = await status.docker();
-    if (!Array.isArray(containers) || containers.length === 0) {
-        // no containers running, run full config
-        await config.fetch.liquidsoap();
-        await config.compose.start();
-        send('status', { ready: true });
+module.exports = async (config) => {
+    try {
+        require(`./${config.service}`).startup(config);
+    } catch(err) {
+        console.error(err);
     }
-
-    status.monitor();
-    sync();
-
-    state.intervals.push(setInterval(async () => {
-        const data = state.get('status:prometheus');
-        send('status', { container: 'prometheus', data });
-    }, 1000 * 60 * 5)); //5min
-
-    ws().on('message', data => {
-        if (common.isJson(data)) data = JSON.parse(data);
-        if (messages[data.action]) return messages[data.action](data.data);
-    });
 };
-
-startup();
 
 state.emitter.on('set:status:container:liquidsoap', (key, [oldValue, newValue]) => {
     //console.log(key, [oldValue, newValue]);
