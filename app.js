@@ -13,7 +13,7 @@ const shutdown = () => {
 };
 
 // start
-require('./controllers/startup')(config.service);
+require('./controllers/startup')(config);
 
 // on end
 process.on('SIGTERM', shutdown);
