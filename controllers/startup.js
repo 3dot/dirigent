@@ -6,7 +6,7 @@ const { ws, send } = require('../services/ws').socket;
 
 module.exports = async (config) => {
     try {
-        require(`./${config.service}`).startup(config);
+        require(`./${config.service.replace('.', '/')}`).startup(config);
     } catch(err) {
         console.error(err);
     }
