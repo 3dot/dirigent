@@ -1,4 +1,6 @@
 const exec = require('util').promisify(require('child_process').exec);
+const axios = require('axios').default;
+const _ = require('lodash');
 
 const common = require('../../services/common');
 const state = require('../../services/state');
@@ -17,16 +19,14 @@ const messages = {
     },
     update: async () => {
         // update dirigent, restart
-        await require('./update')();
-        await send('update:ack', { task: +new Date(), done: true });
-        process.kill(process.pid, 'SIGTERM');
+        await require('../../services/update')(send);
     },
     config: async (data) => {
         // download configuration file, restart container
-        console.log('Download configuration file, restart container');
+        /*console.log('Download configuration file, restart container');
         await config.fetch.liquidsoap();
         await config.container.restart('liquidsoap');
-        send('config:ack', { task: +new Date(), done: true });
+        send('config:ack', { task: +new Date(), done: true });*/
     }
 };
 
@@ -53,7 +53,7 @@ const monitor = () => {
 
     // docker.liquidsoap
     state.intervals.push(setInterval(async () => {
-        const current = await docker.inspect("docker.liquidsoap");
+        const current = await docker.inspect("liquidsoap");
         state.set('status:container:liquidsoap', current);
     }, 1000 * 60 * 1)); //1min
 };
