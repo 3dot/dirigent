@@ -1,5 +1,7 @@
 const WebSocket = require('ws');
 
+const state = require('./state');
+
 let queue = [];
 let socket;
 let status = [false, null];
@@ -35,6 +37,7 @@ const connect = ({ ws, server, signature }) => {
 
     socket.on('message', data => {
         console.log('Received message', data);
+        state.emitter.emit('message', data);
     });
 };
 

@@ -90,12 +90,17 @@ module.exports.startup = async (config) => {
     monitor();
     sync(config.server);
 
-    /*state.intervals.push(setInterval(async () => {
-        const data = state.get('status:prometheus');
-        send('status', { container: 'prometheus', data });
-    }, 1000 * 60 * 5)); //5min*/
+    state.intervals.push(setInterval(async () => {
+        const data = state.get(`set:status:${$me}`);
+        send('status', { container: $me, data });
+    }, 1000 * 60 * 5)); //5min
 
-    ws().on('message', data => {
+    /*ws().on('message', data => {
+        if (common.isJson(data)) data = JSON.parse(data);
+        if (messages[data.action]) return messages[data.action](data.data);
+    });*/
+
+    state.emitter.on('message', data => {
         if (common.isJson(data)) data = JSON.parse(data);
         if (messages[data.action]) return messages[data.action](data.data);
     });
