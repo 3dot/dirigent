@@ -7,3 +7,6 @@ certbot certonly -n --agree-tos --standalone -m $1 -d $2;
 
 cd /home;
 git clone https://github.com/widecastlive/nginx-proxy.git;
+
+export DOMAIN="$1";
+envsubst '${DOMAIN}' < /home/nginx-proxy/conf/nginx.template.conf > /home/nginx-proxy/conf/nginx.conf;
