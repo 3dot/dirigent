@@ -1,7 +1,7 @@
 const exec = require('util').promisify(require('child_process').exec);
 const client = require('../../services/client');
 
-const server = ({ name, ip }) => `location ~/${name}(.*)$ {
+const location = ({ name, ip }) => `location ~/${name}(.*)$ {
     proxy_set_header X-Real-IP  $remote_addr;
     proxy_set_header X-Forwarded-For $remote_addr;
     proxy_set_header Host $host;
@@ -11,6 +11,12 @@ const server = ({ name, ip }) => `location ~/${name}(.*)$ {
 }`;
 
 module.exports = {
+    insert: (home, { name, ip }) => {
+        require('fs').writeFileSync(`${home}/conf/sites/${name}.conf`, location({ name, ip }));
+    },
+    remove: (home, { name }) => {
+        require('fs').unlinkSync(`${home}/conf/sites/${name}.conf`);
+    },
     fetch: {
         all: async () => {
             console.log('Fetch config');

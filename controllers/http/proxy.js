@@ -28,6 +28,14 @@ const messages = {
         await config.fetch.config();
         await config.container.restart('liquidsoap');
         send('config:ack', { task: +new Date(), done: true });*/
+    },
+    "target.add": async (data) => {
+        console.log('Received', 'target.add', data);
+        setup.insert(home, { name: data.name, ip: data.ip });
+    },
+    "target.remove": async (data) => {
+        console.log('Received', 'target.remove', data);
+        setup.remove(home, { name: data.name });
     }
 };
 
