@@ -91,7 +91,7 @@ module.exports.startup = async (config) => {
     sync(config.server);
 
     state.intervals.push(setInterval(async () => {
-        const data = state.get(`set:status:${$me}`);
+        const data = state.get(`status:container:${$me}`);
         send('status', { container: $me, data });
     }, 1000 * 60 * 5)); //5min
 
