@@ -7,7 +7,7 @@ const location = ({ name, ip }) => `location ~/${name}(.*)$ {
     proxy_set_header Host $host;
 
     proxy_cache STATIC;
-    proxy_pass http://${ip}$1;
+    proxy_pass http://${ip}:8080$1;
 }`;
 
 module.exports = {
