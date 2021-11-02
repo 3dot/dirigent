@@ -23,7 +23,7 @@ const messages = {
         await require('../../services/update')(send);
     },
     config: async (data) => {
-        // download configuration file, restart container
+        // download configuration file
         /*console.log('Download configuration file, restart container');
         await config.fetch.config();
         await config.container.restart('liquidsoap');
@@ -82,7 +82,7 @@ module.exports.startup = async (config) => {
     const containers = await docker.overview();
     if (!Array.isArray(containers) || containers.length === 0) {
         // no containers running, run full config
-        await setup.fetch.nginx(home);
+        await setup.fetch.config(home);
         await docker.compose.start(home);
         send('status', { ready: true });
     }
