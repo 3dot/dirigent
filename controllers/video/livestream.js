@@ -74,7 +74,7 @@ module.exports.startup = async (config) => {
     if (!Array.isArray(containers) || containers.length === 0) {
         // no containers running, run full config
         await setup.fetch.nginx(home);
-        await setup.compose.start(home);
+        await docker.compose.start(home);
         send('status', { ready: true });
     }
 
