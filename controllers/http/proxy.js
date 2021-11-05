@@ -2,7 +2,6 @@ const exec = require('util').promisify(require('child_process').exec);
 const axios = require('axios').default;
 const _ = require('lodash');
 
-const common = require('../../services/common');
 const state = require('../../services/state');
 const docker = require('../../services/docker');
 

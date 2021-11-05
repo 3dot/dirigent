@@ -1,6 +1,7 @@
 const WebSocket = require('ws');
 
 const state = require('./state');
+const common = require('./common');
 
 let queue = [];
 let socket;
@@ -37,7 +38,8 @@ const connect = ({ ws, server, signature }) => {
 
     socket.on('message', data => {
         console.log('Received message', data);
-        state.emitter.emit('message', data);
+        if (common.isJson(data)) return state.emitter.emit('message', JSON.parse(data));
+        return state.emitter.emit('message', data);
     });
 };
 
