@@ -10,9 +10,12 @@ const setup = require('./setup');
 
 const home = '/home/liquidsoap-hls';
 
-const { ws, send } = require('../../services/ws').socket;
+const { send } = require('../../services/ws').socket;
 
 const messages = {
+    shutdown: async () => {
+        send('shutdown:ack', true);
+    },
     status: async () => {
         const status = state.get('status:prometheus');
         send('status', { service: "prometheus", status });
@@ -86,8 +89,8 @@ module.exports.startup = async (config) => {
         send('status', { container: 'prometheus', data });
     }, 1000 * 60 * 5)); //5min
 
-    ws().on('message', data => {
-        if (common.isJson(data)) data = JSON.parse(data);
+    state.emitter.on('message', data => {
+        if (data.constructor !== Object) return;
         if (messages[data.action]) return messages[data.action](data.data);
     });
 
