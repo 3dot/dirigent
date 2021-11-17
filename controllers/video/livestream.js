@@ -7,9 +7,10 @@ const docker = require('../../services/docker');
 
 const setup = require('./setup');
 
-const home = '/home/nginxffmpeg';
-
 const { send } = require('../../services/ws').socket;
+
+const $me = "nginxffmpeg";
+const home = `/home/${$me}`;
 
 const messages = {
     shutdown: async () => {

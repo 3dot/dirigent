@@ -7,17 +7,18 @@ const docker = require('../../services/docker');
 
 const setup = require('./setup');
 
-const home = '/home/liquidsoap-hls';
-
 const { send } = require('../../services/ws').socket;
+
+const $me = "liquidsoap-hls";
+const home = `/home/${$me}`;
 
 const messages = {
     shutdown: async () => {
         send('shutdown:ack', true);
     },
     status: async () => {
-        const status = state.get('status:prometheus');
-        send('status', { service: "prometheus", status });
+        /*const status = state.get('status:liquidsoap');
+        send('status', { service: "liquidsoap", status });*/
     },
     update: async () => {
         // update dirigent, restart
@@ -35,13 +36,13 @@ const messages = {
 const monitor = () => {
     // prometheus
     state.intervals.push(setInterval(async () => {
-        let api = await Promise.all([
+        const api = await Promise.all([
             axios.get('http://127.0.0.1:9090/api/v1/query?query=liquidsoap_is_playing').then(res => res.data || null).catch(err => console.error(err)),
             axios.get('http://127.0.0.1:9090/api/v1/query?query=liquidsoap_is_ready').then(res => res.data || null).catch(err => console.error(err)),
             axios.get('http://127.0.0.1:9090/api/v1/query?query=liquidsoap_is_preferred_livesource').then(res => res.data || null).catch(err => console.error(err))
         ]);
-
-        api = api.map(item => {
+        
+        const data = api.map(item => {
             if (item.status !== 'success') return null;
             const data = {};
             item.data.result.forEach(result => {
@@ -50,7 +51,7 @@ const monitor = () => {
             return data;
         });
 
-        state.set('status:prometheus', { playing: api[0], ready: api[1], preferred: api[2] });
+        state.set('metric:prometheus', { playing: data[0], ready: data[1], preferred: data[2] });
     }, 1000 * 10)); //10s
 
     // docker.liquidsoap
@@ -84,9 +85,14 @@ module.exports.startup = async (config) => {
     sync(config.server);
 
     state.intervals.push(setInterval(async () => {
-        const data = state.get('status:prometheus');
-        send('status', { container: 'prometheus', data });
+        const data = state.get('status:container:liquidsoap');
+        send('status', { container: 'liquidsoap', data });
     }, 1000 * 60 * 5)); //5min
+
+    state.intervals.push(setInterval(async () => {
+        const metric = state.get('metric:prometheus');
+        if (metric) send('metric', metric);
+    }, 1000 * 60 * 1)); //1min
 
     state.emitter.on('message', data => {
         if (data.constructor !== Object) return;
