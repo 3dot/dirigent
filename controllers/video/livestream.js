@@ -1,6 +1,7 @@
 const exec = require('util').promisify(require('child_process').exec);
 const axios = require('axios').default;
 const _ = require('lodash');
+const xml2js = require('xml2js');
 
 const state = require('../../services/state');
 const docker = require('../../services/docker');
@@ -34,25 +35,13 @@ const messages = {
 };
 
 const monitor = () => {
-    // prometheus
-    /*state.intervals.push(setInterval(async () => {
-        let api = await Promise.all([
-            axios.get('http://127.0.0.1:9090/api/v1/query?query=liquidsoap_is_playing').then(res => res.data || null).catch(err => console.error(err)),
-            axios.get('http://127.0.0.1:9090/api/v1/query?query=liquidsoap_is_ready').then(res => res.data || null).catch(err => console.error(err)),
-            axios.get('http://127.0.0.1:9090/api/v1/query?query=liquidsoap_is_preferred_livesource').then(res => res.data || null).catch(err => console.error(err))
-        ]);
+    // nginx
+    state.intervals.push(setInterval(async () => {
+        const metric = await axios.get('http://127.0.0.1:8080/stat').then(res => res.data || null).catch(err => console.error(err));
+        const data = await new xml2js.Parser({ explicitArray: false }).parseStringPromise(metric);
 
-        api = api.map(item => {
-            if (item.status !== 'success') return null;
-            const data = {};
-            item.data.result.forEach(result => {
-                data[`${result.metric.type}.${result.metric.name}`] = (result.value[1] === "1");
-            });
-            return data;
-        });
-
-        state.set('status:prometheus', { playing: api[0], ready: api[1], preferred: api[2] });
-    }, 1000 * 10)); //10s*/
+        state.set('status:nginx', data);
+    }, 1000 * 15)); //10s
 
     // docker.liquidsoap
     state.intervals.push(setInterval(async () => {
@@ -84,10 +73,15 @@ module.exports.startup = async (config) => {
     monitor();
     sync(config.server);
 
-    /*state.intervals.push(setInterval(async () => {
-        const data = state.get('status:prometheus');
-        send('status', { container: 'prometheus', data });
-    }, 1000 * 60 * 5)); //5min*/
+    state.intervals.push(setInterval(async () => {
+        const data = state.get('status:container:nginx-rtmp');
+        send('status', { container: 'nginx-rtmp', data });
+    }, 1000 * 60 * 5)); //5min
+
+    state.intervals.push(setInterval(async () => {
+        const metric = state.get('metric:nginx');
+        if (metric) send('metric', metric);
+    }, 1000 * 15)); //15sec
 
     state.emitter.on('message', data => {
         if (data.constructor !== Object) return;
