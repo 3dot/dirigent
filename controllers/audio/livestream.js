@@ -92,7 +92,7 @@ module.exports.startup = async (config) => {
     state.intervals.push(setInterval(async () => {
         const metric = state.get('metric:prometheus');
         if (metric) send('metric', metric);
-    }, 1000 * 60 * 1)); //1min
+    }, 1000 * 30)); //30sec
 
     state.emitter.on('message', data => {
         if (data.constructor !== Object) return;
