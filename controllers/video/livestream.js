@@ -40,7 +40,7 @@ const monitor = () => {
         const metric = await axios.get('http://127.0.0.1:8080/stat').then(res => res.data || null).catch(err => console.error(err));
         const data = await new xml2js.Parser({ explicitArray: false }).parseStringPromise(metric);
 
-        state.set('status:nginx', data);
+        state.set('metric:nginx', data);
     }, 1000 * 15)); //10s
 
     // docker.liquidsoap
