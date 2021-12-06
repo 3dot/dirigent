@@ -15,6 +15,9 @@ module.exports = {
 
             await exec(`cp ${home}/radio/live.liq ${home}/radio/live.bck.liq`);
             return require('fs').writeFileSync(`${home}/radio/live.liq`, config.data);
+        },
+        credentials: async () => {
+            return client.get('/credentials').then(res => res.data);
         }
     }
 };

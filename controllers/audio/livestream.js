@@ -26,9 +26,10 @@ const messages = {
     },
     config: async () => {
         // download configuration file, restart container
-        console.log('Download configuration file, restart container');
+        console.log('Config update, then restart container');
         await setup.fetch.liquidsoap(home);
         await docker.compose.restart(home);
+        console.log('Config update completed');
         send('config:ack', { task: +new Date(), done: true });
     },
     sync: async (config) => {
@@ -67,7 +68,7 @@ const monitor = () => {
 
 const sync = async (server) => {
     console.log('Sync run');
-    const credentials = await axios.get('/credentials').then(res => res.data);
+    const credentials = await setup.fetch.credentials();
     await exec(`find ${home}/hls/archive -name *.aac -type f -mmin +720 -delete`).catch(console.error);
     await exec(`find ${home}/hls/archive -empty -type d -delete`).catch(console.error);
     await exec(`export AWS_ACCESS_KEY_ID=${credentials.key} && export AWS_SECRET_ACCESS_KEY=${credentials.secret} && export AWS_SESSION_TOKEN=${credentials.token} && cd ${home}/hls/archive && aws s3 sync . s3://cloud.widecast.storage.ingress/${server}/`).catch(console.error);
