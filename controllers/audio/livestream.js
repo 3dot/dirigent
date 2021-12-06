@@ -65,7 +65,7 @@ const monitor = () => {
     }, 1000 * 60 * 1)); //1min
 };
 
-const sync = (server) => {
+const sync = async (server) => {
     console.log('Sync run');
     const credentials = await axios.get('/credentials').then(res => res.data);
     await exec(`find ${home}/hls/archive -name *.aac -type f -mmin +720 -delete`).catch(console.error);
