@@ -24,12 +24,16 @@ const messages = {
         // update dirigent, restart
         await require('../../services/update')(send);
     },
-    config: async (data) => {
+    config: async () => {
         // download configuration file, restart container
-        /*console.log('Download configuration file, restart container');
-        await config.fetch.liquidsoap();
-        await config.container.restart('liquidsoap');
-        send('config:ack', { task: +new Date(), done: true });*/
+        console.log('Download configuration file, restart container');
+        await setup.fetch.liquidsoap(home);
+        await docker.compose.restart();
+        send('config:ack', { task: +new Date(), done: true });
+    },
+    sync: async (config) => {
+        // forces sync run
+        sync(config.server);
     }
 };
 
@@ -80,7 +84,6 @@ module.exports.startup = async (config) => {
     }
 
     monitor();
-    sync(config.server);
 
     state.intervals.push(setInterval(async () => {
         sync(config.server);
@@ -98,7 +101,7 @@ module.exports.startup = async (config) => {
 
     state.emitter.on('message', data => {
         if (data.constructor !== Object) return;
-        if (messages[data.action]) return messages[data.action](data.data);
+        if (messages[data.action]) return messages[data.action](config, data.data);
     });
 
     state.emitter.on('set:status:container:liquidsoap', (key, [oldValue, newValue]) => {

@@ -28,7 +28,7 @@ module.exports = {
         },
         restart: async (home) => {
             console.log('Restarting docker compose');
-            const { stdout } = await exec(`cd ${home} && docker-compose restart`);
+            const { stdout } = await exec(`cd ${home} && docker-compose up -d --build`);
             return stdout;
         },
         stop: async (home) => {
