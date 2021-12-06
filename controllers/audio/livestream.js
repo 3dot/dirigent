@@ -62,14 +62,12 @@ const monitor = () => {
 };
 
 const sync = (server) => {
-    state.intervals.push(setInterval(async () => {
-        console.log('Sync run');
-        const credentials = await client.get('/credentials').then(res => res.data);
-        await exec(`find ${home}/hls/archive -name *.aac -type f -mmin +720 -delete`).catch(console.error);
-        await exec(`find ${home}/hls/archive -empty -type d -delete`).catch(console.error);
-        await exec(`export AWS_ACCESS_KEY_ID=${credentials.key} && export AWS_SECRET_ACCESS_KEY=${credentials.secret} && export AWS_SESSION_TOKEN=${credentials.token} && cd ${home}/hls/archive && aws s3 sync . s3://cloud.widecast.storage.ingress/${server}/`).catch(console.error);
-        console.log('Sync run completed');
-    }, 1000 * 60 * 60 * 4));
+    console.log('Sync run');
+    const credentials = await axios.get('/credentials').then(res => res.data);
+    await exec(`find ${home}/hls/archive -name *.aac -type f -mmin +720 -delete`).catch(console.error);
+    await exec(`find ${home}/hls/archive -empty -type d -delete`).catch(console.error);
+    await exec(`export AWS_ACCESS_KEY_ID=${credentials.key} && export AWS_SECRET_ACCESS_KEY=${credentials.secret} && export AWS_SESSION_TOKEN=${credentials.token} && cd ${home}/hls/archive && aws s3 sync . s3://cloud.widecast.storage.ingress/${server}/`).catch(console.error);
+    console.log('Sync run completed');
 };
 
 module.exports.startup = async (config) => {
@@ -83,6 +81,10 @@ module.exports.startup = async (config) => {
 
     monitor();
     sync(config.server);
+
+    state.intervals.push(setInterval(async () => {
+        sync(config.server);
+    }, 1000 * 60 * 60 * 4));
 
     state.intervals.push(setInterval(async () => {
         const data = state.get('status:container:liquidsoap');
