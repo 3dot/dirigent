@@ -28,7 +28,7 @@ const messages = {
         // download configuration file, restart container
         console.log('Download configuration file, restart container');
         await setup.fetch.liquidsoap(home);
-        await docker.compose.restart();
+        await docker.compose.restart(home);
         send('config:ack', { task: +new Date(), done: true });
     },
     sync: async (config) => {
