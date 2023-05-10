@@ -5,9 +5,9 @@
   "author": "Miran Hojnik <miran@3dot.net>",
   "license": "MIT",
   "dependencies": {
-    "axios": "^0.21.1",
+    "axios": "^1.4.0",
     "lodash": "^4.17.21",
-    "ws": "^7.5.0",
-    "xml2js": "^0.4.23"
+    "ws": "^8.13.0",
+    "xml2js": "^0.5.0"
   }
 }
