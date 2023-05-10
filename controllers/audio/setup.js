@@ -13,8 +13,8 @@ module.exports = {
             const config = await client.post('/config', { config: ['liquidsoap'] });
             if (!config.data) return;
 
-            await exec(`cp ${home}/radio/live.liq ${home}/radio/live.bck.liq`);
-            return require('fs').writeFileSync(`${home}/radio/live.liq`, config.data);
+            await exec(`cp ${home}/live.liq ${home}/live.bck.liq`);
+            return require('fs').writeFileSync(`${home}/live.liq`, config.data);
         },
         credentials: async () => {
             return client.get('/credentials').then(res => res.data);
