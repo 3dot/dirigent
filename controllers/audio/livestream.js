@@ -88,7 +88,7 @@ module.exports.startup = async (config) => {
 
     state.intervals.push(setInterval(async () => {
         sync(config.server);
-    }, 1000 * 60 * 60 * 4));
+    }, 1000 * 60 * 60 * 4)); //4h
 
     state.intervals.push(setInterval(async () => {
         const data = state.get('status:container:liquidsoap');
