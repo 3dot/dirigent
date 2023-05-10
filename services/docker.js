@@ -23,17 +23,17 @@ module.exports = {
     compose: {
         start: async (home) => {
             console.log('Starting docker compose');
-            const { stdout } = await exec(`cd ${home} && docker-compose up -d`);
+            const { stdout } = await exec(`cd ${home} && docker compose up -d`);
             return stdout;
         },
         restart: async (home) => {
             console.log('Restarting docker compose');
-            const { stdout } = await exec(`cd ${home} && docker-compose up -d --build`);
+            const { stdout } = await exec(`cd ${home} && docker compose up -d --build`);
             return stdout;
         },
         stop: async (home) => {
             console.log('Stopping docker compose');
-            const { stdout } = await exec(`cd ${home} && docker-compose down`);
+            const { stdout } = await exec(`cd ${home} && docker compose down`);
             return stdout;
         }
     }
