@@ -13,7 +13,7 @@ module.exports = {
             const config = await client.post('/config', { config: ['liquidsoap'] });
             if (!config.data) return;
 
-            await exec(`cp ${home}/live.liq ${home}/live.bck.liq`);
+            await exec(`cp ${home}/live.liq ${home}/live.bck.liq 2>/dev/null || :`);
             return require('fs').writeFileSync(`${home}/live.liq`, config.data);
         },
         credentials: async () => {

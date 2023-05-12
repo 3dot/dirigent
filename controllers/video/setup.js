@@ -13,7 +13,7 @@ module.exports = {
             const config = await client.post('/config', { config: ['nginx'] });
             if (!config.data) return;
 
-            await exec(`cp ${home}/nginx.conf ${home}/nginx.bck.conf`);
+            await exec(`cp ${home}/nginx.conf ${home}/nginx.bck.conf 2>/dev/null || :`);
             return require('fs').writeFileSync(`${home}/nginx.conf`, config.data);
         }
     }
